@@ -31,7 +31,7 @@ export default class Store {
         }
 
         return this.database;
-    }
+    } 
 
     public async connect() { 
         try {

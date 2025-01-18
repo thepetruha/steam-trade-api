@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/main.js",
     "dev": "NODE_ENV=development nodemon src/main.ts",
-    "build": "tsc"
+    "build": "tsc && cp -R ./src/migrations ./dist/"
   },
   "author": "",
   "license": "ISC",

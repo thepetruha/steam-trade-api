@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2016",                   /* Уровень JavaScript, на который будет транслироваться код. */
-    "module": "commonjs",                 /* Модульная система CommonJS для Node.js. */
-    "outDir": "./dist",                   /* Директория для собранных файлов. */
-    "rootDir": "./src",                   /* Исходный каталог для TypeScript файлов. */
-    "esModuleInterop": true,              /* Совместимость с CommonJS модулями. */
-    "forceConsistentCasingInFileNames": true, /* Проверка соответствия регистра в названиях файлов. */
-    "strict": true,                       /* Включение строгого режима. */
-    "skipLibCheck": true                  /* Пропуск проверки типов в библиотечных файлах .d.ts. */
+    "target": "es2016",                         /* Уровень JavaScript, на который будет транслироваться код. */
+    "module": "commonjs",                       /* Модульная система CommonJS для Node.js. */
+    "outDir": "./dist",                         /* Директория для собранных файлов. */
+    "rootDir": "./src",                         /* Исходный каталог для TypeScript файлов. */
+    "esModuleInterop": true,                    /* Совместимость с CommonJS модулями. */
+    "forceConsistentCasingInFileNames": true,   /* Проверка соответствия регистра в названиях файлов. */
+    "strict": true,                             /* Включение строгого режима. */
+    "skipLibCheck": true                        /* Пропуск проверки типов в библиотечных файлах .d.ts. */
   },
-  "include": ["src/**/*"],                /* Включаем все файлы в каталоге src. */
-  "exclude": ["node_modules", "dist"]     /* Исключаем node_modules и dist. */
+  "include": ["src/**/*"],                      /* Включаем все файлы в каталоге src. */
+  "exclude": ["node_modules", "dist"]           /* Исключаем node_modules и dist. */
 }
