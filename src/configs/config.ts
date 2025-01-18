@@ -15,4 +15,7 @@ export default {
     redisPassword:  process.env.REDIS_PASSWORD,
     postgresUser:  process.env.POSTGRES_USER,
     postgresPassword:  process.env.POSTGRES_PASSWORD,
+    postgresPort: 5432,
+    postgresHost: "127.0.0.1",
+    postgresDatabase: "SteamTradeApi"
 }

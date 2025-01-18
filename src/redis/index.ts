@@ -30,7 +30,7 @@ class RedisClient {
         return this.instance;
     }
 
-    public async start() {
+    public async connect() {
         try {
             if (this.client.status === 'ready') {
                 Logger("INFO", "REDIS", "Redis client is already connected.");

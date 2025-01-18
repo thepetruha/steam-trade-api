@@ -1,62 +1,59 @@
-// import { Db, MongoClient } from "mongodb";
+import postgres from "postgres";
+import config from "../configs/config";
+import Logger from "../utils/logger";
 
-// const MONGODB_URL = "mongodb://localhost:27017";
-// const MONGODB_DATABASE = "BabbleChat"
-// const NUM_OF_CONNECTION = 3;
+const NUM_OF_CONNECTION = 3;
 
-// export default class Store {
-//     private static instance: Store;
-//     public storeConnector!: MongoClient;
-//     public database!: Db;
-//     private countConnection: number = 0;
+export default class Store {
+    private static instance: Store;
+    public database!: postgres.Sql;
+    private countConnection: number = 0;
 
-//     public static init() {
-//         if (!this.instance) {
-//             this.instance = new Store();
-//         }
+    public static init() {
+        if (!this.instance) {
+            this.instance = new Store();
+        }
 
-//         return this.instance;
-//     }
+        return this.instance;
+    }
 
-//     public static getInstance() {
-//         if (!this.instance) {
-//             throw new Error('Call init() before getInstance()');
-//         }
+    public static getInstance() {
+        if (!this.instance) {
+            throw new Error('Call init() before getInstance()');
+        }
 
-//         return this.instance;
-//     }
-    
-//     public getConnector() {
-//         if (!this.storeConnector) {
-//             throw new Error('Call connect() before getConnector()');
-//         }
-            
-//         return this.storeConnector;    
-//     }
+        return this.instance;
+    }
 
-//     public getDatabase() {
-//         if (!this.database) {
-//             throw new Error('Call connect() before getConnector()'); 
-//         }
+    public getDatabase() {
+        if (!this.database) {
+            throw new Error('Call connect() before getConnector()'); 
+        }
 
-//         return this.database;
-//     }
+        return this.database;
+    }
 
-//     public async connect() { 
-//         try {
-//             this.countConnection++;
-//             const mongoClient = new MongoClient(MONGODB_URL);
-//             console.log(`[STORE] ${NUM_OF_CONNECTION}/${this.countConnection} Try connect to MongoDB`);
-//             this.storeConnector = await mongoClient.connect();
-//             this.database = this.storeConnector.db(MONGODB_DATABASE);
-//             console.log('[STORE] Success connected!');
-//         } catch (error) {
-//             if (this.countConnection === NUM_OF_CONNECTION) {
-//                 console.error(error);
-//                 process.exit(1);
-//             }
+    public async connect() { 
+        try {
+            this.countConnection++;
 
-//             await this.connect();
-//         }
-//     }
-// }
+            const pg = postgres({
+                user: config.postgresUser,
+                password: config.postgresPassword,
+                database: config.postgresDatabase,
+                host: config.postgresHost
+            });
+
+            this.database = pg;
+
+            Logger("INFO", "POSTGRESQL", "PostgreSQL client is already connected.")
+        } catch (error) {
+            if (this.countConnection === NUM_OF_CONNECTION) {
+                Logger("ERROR", "POSTGRESQL", "PostgreSQL client is already connected1.")
+                process.exit(1);
+            }
+
+            await this.connect();
+        }
+    }
+}
