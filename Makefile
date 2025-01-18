@@ -1,5 +1,19 @@
 .PHONY: build, dev, push, d_build, d_run, d_rebuild
 
+full_setup_dev:
+	docker-compose --env-file .env.development up --build -d
+
+full_setup_prod:
+	docker-compose --env-file .env.production up --build -d
+
+resetup_dev:
+	docker-compose --env-file .env.development down --volumes --remove-orphans
+	docker-compose --env-file .env.development up --build --force-recreate -d
+
+resetup_prod:
+	docker-compose --env-file .env.production down --volumes --remove-orphans
+	docker-compose --env-file .env.production up --build --force-recreate -d
+
 dev:
 	npm run dev
 clear_modules:

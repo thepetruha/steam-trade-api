@@ -1,8 +1,7 @@
 import express, { Express } from "express";
 import Logger from "../utils/logger";
-// import cors from "cors";
-
-const API_SERVER_PORT = 4343;
+import cors from "cors";
+import config from "../configs/config";
 
 export default class API {
     private static instance: API;
@@ -28,30 +27,52 @@ export default class API {
         return this.instance;
     }
 
-    public async start() {
-        Logger("INFO", "API", "Init API Endpoints");
-        // this.apiServer.use(express.json());
-        // this.apiServer.use(express.urlencoded({ extended: true }));
-        // this.apiServer.use(cors({
-        //     origin: "*",
-        //     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        //     allowedHeaders: ['Content-Type', 'Authorization'],
-        // }))
+    private routesV2() {
+        const router = express.Router();
 
+        router.use(express.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(cors({
+            origin: "*",
+            methods: ['GET', 'POST', 'PUT', 'DELETE'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+        }));
+
+        router.get("/hello", (req, res) => {
+            res.send({
+                s: "hello"
+            })
+        })
+ 
         // const authRouter = new AuthRouter().routesInit();
         // this.apiServer.use(authRouter);
-
-        // const usersRouter = new UsersRouter().routesInit();
-        // this.apiServer.use(usersRouter);
         
-        // const chatsRouter = new ChatsRouter().routesInit();
-        // this.apiServer.use(chatsRouter);
+        return router;
+    }
 
+    private routesV1() {
+        const router = express.Router();
+        // const usersRouter = new UsersRouter().routesInit();
         // const messagesRouter = new MessagesRouter().routesInit();
-        // this.apiServer.use(messagesRouter);
+        // const chatsRouter = new ChatsRouter().routesInit();
+ 
+        // router.use(usersRouter); 
+        // router.use(chatsRouter);
+        // router.use(messagesRouter); 
 
-        this.apiServer.listen(API_SERVER_PORT, () => {
-            Logger("INFO", "API", `Run API Server on port ${API_SERVER_PORT}`);
+        return router;
+    }
+
+    public async start() {
+        Logger("INFO", "API", "Init API Endpoints");
+
+        this.apiServer.use("/api/v1", this.routesV1());
+        this.apiServer.use("/api/v2", this.routesV2()); 
+
+        console.log(config)
+
+        this.apiServer.listen(config.httpServerPort, () => {
+            Logger("INFO", "API", `Run API Server on port ${config.httpServerPort}`);
         });
     }
 }
