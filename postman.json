@@ -4,24 +4,5 @@
     "description": "Generated API Endpoints for Postman",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "item": [
-    {
-      "name": "/api/v2/hello [GET]",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/v2/hello",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "v2",
-            "hello"
-          ]
-        }
-      }
-    }
-  ]
+  "item": []
 }
