@@ -1,4 +1,4 @@
-export default function Logger(...msg: string[]): void {
+export default function Logger(...msg: any[]): void {
     const now = new Date();
     const timestamp = now.toISOString(); 
   

@@ -69,7 +69,7 @@ export default class API {
         this.apiServer.use("/api/v1", this.routesV1());
         this.apiServer.use("/api/v2", this.routesV2()); 
 
-        console.log(config)
+        // exportEndpoints(this.apiServer, "../../postman.json")
 
         this.apiServer.listen(config.httpServerPort, () => {
             Logger("INFO", "API", `Run API Server on port ${config.httpServerPort}`);

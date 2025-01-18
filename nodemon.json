@@ -1,0 +1,5 @@
+{
+    "ignore": ["postman.json"], 
+    "ext": "js,ts,json", 
+    "exec": "ts-node ./src/main.ts" 
+}
