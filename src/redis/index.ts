@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import Logger from "../utils/logger";
+import config from "../configs/config";
 
 class RedisClient {
     private static instance: RedisClient;
@@ -7,8 +8,8 @@ class RedisClient {
 
     constructor() {
         this.client = new Redis({
-            port: 6379,
-            host: "127.0.0.1",
+            port: config.redisPort,
+            host: config.redisHost,
             // username: config.redisUser,
             // password: config.redisPassword,
         });
