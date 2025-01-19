@@ -3,6 +3,7 @@ import Logger from "../utils/logger";
 import cors from "cors";
 import config from "../configs/config";
 import exportEndpoints from "../utils/postman";
+import AuthRouter from "../routes/auth";
 
 export default class API {
     private static instance: API;
@@ -43,14 +44,7 @@ export default class API {
 
     private routesV2() {
         const router = express.Router(); 
-        // const authRouter = new AuthRouter().routesInit();
-        // this.apiServer.use(authRouter);
-        
-        return router;
-    }
 
-    private routesV1() {
-        const router = express.Router();
         // const usersRouter = new UsersRouter().routesInit();
         // const messagesRouter = new MessagesRouter().routesInit();
         // const chatsRouter = new ChatsRouter().routesInit();
@@ -58,6 +52,16 @@ export default class API {
         // router.use(usersRouter); 
         // router.use(chatsRouter);
         // router.use(messagesRouter); 
+
+        return router;
+    }
+
+    private routesV1() {
+        const router = express.Router();
+
+        const authRouter = new AuthRouter().routesInit();
+        
+        router.use(authRouter);
 
         return router;
     }
