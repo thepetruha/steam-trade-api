@@ -1,18 +1,17 @@
 import { Router } from "express";
-import AuthHandler from "../handlers/auth";
+import PurchasesHandler from "../handlers/purchases";
 
 export default class PurchasesRouter {
-    // private authHandler: AuthHandler;
-    // private authRouter: Router;
+    private purchasesHandler: PurchasesHandler;
+    private purchasesrouter: Router;
 
-    // constructor() {
-    //     this.authHandler = new AuthHandler();
-    //     this.authRouter = Router();
-    // }
+    constructor() {
+        this.purchasesHandler = new PurchasesHandler();
+        this.purchasesrouter = Router();
+    }
 
-    // public routesInit() {
-    //     this.authRouter.post("/auth/register", this.authHandler.handleCreate.bind(this.authHandler));
-    //     this.authRouter.post("/auth/login", this.authHandler.handleCreate.bind(this.authHandler));
-    //     return this.authRouter;
-    // }
+    public routesInit() {
+        this.purchasesrouter.post("/purchase", this.purchasesHandler.handleCreate.bind(this.purchasesHandler));
+        return this.purchasesrouter;
+    }
 }
