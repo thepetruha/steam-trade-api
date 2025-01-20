@@ -4,6 +4,9 @@ import cors from "cors";
 import config from "../configs/config";
 import exportEndpoints from "../utils/postman";
 import AuthRouter from "../routes/auth";
+import ProductRouter from "../routes/products";
+import PurchasesRouter from "../routes/purchases";
+import SkinportRouter from "../routes/skinport";
 
 export default class API {
     private static instance: API;
@@ -44,31 +47,29 @@ export default class API {
 
     private routesV2() {
         const router = express.Router(); 
+        const productsRouter = new ProductRouter().routesInit();
+        const purchasesRouter = new PurchasesRouter().routesInit();
+        const skinportRouter = new SkinportRouter().routesInit();
 
-        // const usersRouter = new UsersRouter().routesInit();
-        // const messagesRouter = new MessagesRouter().routesInit();
-        // const chatsRouter = new ChatsRouter().routesInit();
- 
-        // router.use(usersRouter); 
-        // router.use(chatsRouter);
-        // router.use(messagesRouter); 
+        router.use(productsRouter); 
+        router.use(purchasesRouter);
+        router.use(skinportRouter);
 
         return router;
     }
 
     private routesV1() {
         const router = express.Router();
-
         const authRouter = new AuthRouter().routesInit();
-        
-        router.use(authRouter);
 
+        router.use(authRouter); 
+        
         return router;
     }
 
     public async start() {
         Logger("INFO", "API", "Init API Endpoints");
-
+        
         this.middlewares();
         this.routesCors();
 

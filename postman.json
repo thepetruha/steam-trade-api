@@ -42,6 +42,61 @@
           ]
         }
       }
+    },
+    {
+      "name": "/api/v2/product [POST]",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v2/product",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "product"
+          ]
+        }
+      }
+    },
+    {
+      "name": "/api/v2/purchase [POST]",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v2/purchase",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "purchase"
+          ]
+        }
+      }
+    },
+    {
+      "name": "/api/v2/skinport/items [POST]",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v2/skinport/items",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "skinport",
+            "items"
+          ]
+        }
+      }
     }
   ]
 }

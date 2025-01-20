@@ -15,7 +15,6 @@ export interface IProduct {
     price: number;
 }
 
-
 export default class ProductStore {
     private db: postgres.Sql;
 

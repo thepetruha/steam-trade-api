@@ -31,6 +31,10 @@ class RedisClient {
         return this.instance;
     }
 
+    public getConnect() {
+        return this.client
+    }
+
     public async connect() {
         try {
             if (this.client.status === 'ready') {

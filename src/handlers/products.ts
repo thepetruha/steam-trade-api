@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import UserStore, { IUser, IUserRegister } from "../store/users";
 import Handler, { Status } from ".";
-import {hashPassword} from "../utils/hasher";
 import ProductStore, { IProduct } from "../store/products";
 
 export default class ProductsHandler extends Handler {
@@ -17,8 +15,8 @@ export default class ProductsHandler extends Handler {
             const productBody = req.body as IProduct;
 
             const product: IProduct = {
-                name: "",
-                price: 0
+                name: "Hello world 2",
+                price: 200
             }
 
             const userCreated = await this.productStore.create(product);

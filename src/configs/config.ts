@@ -9,8 +9,8 @@ dotenv.config({ path: pathEnv });
 
 export default {
     httpServerPort:             Number(process.env.HTTP_SERVER_PORT || 4343), 
-    skinportApiClientId:        process.env.SKINPORT_API_CLIENT_ID,
-    slinportApiClientSecret:    process.env.SKINPORT_API_CLIENT_SECRET,
+    skinportApiClientId:        process.env.SKINPORT_API_CLIENT_ID || null,
+    skinportApiClientSecret:    process.env.SKINPORT_API_CLIENT_SECRET || null,
     redisUser:                  process.env.REDIS_USER,
     redisPassword:              process.env.REDIS_PASSWORD,
     redisHost:                  process.env.REDIS_HOST,
@@ -20,4 +20,5 @@ export default {
     postgresPort:               Number(process.env.POSTGRES_PORT || 5432),
     postgresHost:               process.env.POSTGRES_HOST,
     postgresDatabase:           process.env.POSTGRES_DB,
+    skinportHost:               process.env.SKINPORT_API_HOST || "https://api.skinport.com"
 }
