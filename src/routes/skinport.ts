@@ -11,7 +11,7 @@ export default class SkinportRouter {
     }
 
     public routesInit() {
-        this.skinportRouter.post("/skinport/items", this.skinportHandler.getItems.bind(this.skinportHandler));
+        this.skinportRouter.get("/skinport/items", this.skinportHandler.getItems.bind(this.skinportHandler));
         return this.skinportRouter;
     }
 }

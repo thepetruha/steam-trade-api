@@ -80,9 +80,9 @@
       }
     },
     {
-      "name": "/api/v2/skinport/items [POST]",
+      "name": "/api/v2/skinport/items [GET]",
       "request": {
-        "method": "POST",
+        "method": "GET",
         "header": [],
         "url": {
           "raw": "{{base_url}}/api/v2/skinport/items",

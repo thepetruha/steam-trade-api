@@ -39,7 +39,6 @@ class Skinport extends HTTP {
         return this.instance;
     }
 
-    //Cache-Control: max-age=604800
     public async getItems(currency: "USD" | "EUR"): Promise<{ status: number, body: ISkinportItem[] }> {
         const endpoint = "/v1/items" + `?currency=${currency}` + `&tradable=${true}`;
         const { body, status } = await this.request(endpoint, {
