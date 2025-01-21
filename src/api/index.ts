@@ -2,10 +2,8 @@ import express, { Express } from "express";
 import Logger from "../utils/logger";
 import cors from "cors";
 import config from "../configs/config";
-import exportEndpoints from "../utils/postman";
 import AuthRouter from "../routes/auth";
 import ProductRouter from "../routes/products";
-import PurchasesRouter from "../routes/purchases";
 import SkinportRouter from "../routes/skinport";
 import authenticate from "../middleware/auth";
 
