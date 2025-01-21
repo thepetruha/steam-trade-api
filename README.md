@@ -144,8 +144,6 @@ The project generates API documentation automatically for use with Postman. Afte
 
 ## Migration Module
 
-To illustrate the migration structure, here is an example diagram:
-
 ![Migrations](https://github.com/thepetruha/steam-trade-api/blob/main/screenshots/migrations.png?raw=true)
 
 ### Description
