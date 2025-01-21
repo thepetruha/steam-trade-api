@@ -78,7 +78,7 @@ This will:
  ✔ Container node_app_container            Started
 ```
 
-![alt text](https://github.com/thepetruha/steam-trade-api/blob/main/screenshorts/postman.png?raw=true)
+![alt text](https://github.com/thepetruha/steam-trade-api/blob/main/screenshots/docker.png?raw=true)
 
 ---
 
@@ -138,7 +138,7 @@ The project generates API documentation automatically for use with Postman. Afte
    - **Path**: `postman_api.json`
    - **Base URL**: `http://localhost:${HTTP_SERVER_PORT}`
 
-![alt text](https://github.com/thepetruha/steam-trade-api/blob/main/screenshorts/postman.png?raw=true)
+![alt text](https://github.com/thepetruha/steam-trade-api/blob/main/screenshots/postman.png?raw=true)
 
 ---
 
@@ -146,7 +146,7 @@ The project generates API documentation automatically for use with Postman. Afte
 
 To illustrate the migration structure, here is an example diagram:
 
-![Migrations](https://github.com/thepetruha/steam-trade-api/blob/main/screenshorts/migrations?raw=true)
+![Migrations](https://github.com/thepetruha/steam-trade-api/blob/main/screenshots/migrations?raw=true)
 
 ### Description
 
