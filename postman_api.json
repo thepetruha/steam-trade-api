@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "01b4d40f-0225-4e95-bc2f-4edd05719d78",
+		"name": "API Endpoints",
+		"description": "Generated API Endpoints for Postman",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16594482"
+	},
+	"item": [
+		{
+			"name": "/api/v1/auth/register [POST]",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"thepetruha\",\n    \"password\": \"My_Secure@99\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/auth/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/auth/password/change [POST]",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "My_Secure@99",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "thepetruha",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"My_Secure@99\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/auth/password/change",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"password",
+						"change"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v2/product [POST]",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v2/product",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v2/product/purchase [POST]",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "My_Secure@99",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "thepetruha",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v2/product/purchase",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"product",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v2/skinport/items [GET]",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "My_Secure@99",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "thepetruha",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v2/skinport/items?app_id=730",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"skinport",
+						"items"
+					],
+					"query": [
+						{
+							"key": "app_id",
+							"value": "730"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
