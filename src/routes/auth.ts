@@ -1,5 +1,6 @@
 import { Router } from "express";
 import AuthHandler from "../handlers/auth";
+import authenticate from "../middleware/auth";
 
 export default class AuthRouter {
     private authHandler: AuthHandler;
@@ -11,8 +12,8 @@ export default class AuthRouter {
     }
 
     public routesInit() {
-        this.authRouter.post("/auth/register", this.authHandler.handleCreate.bind(this.authHandler));
-        this.authRouter.post("/auth/login", this.authHandler.handleCreate.bind(this.authHandler));
+        this.authRouter.post("/auth/register", this.authHandler.handleRegist.bind(this.authHandler));
+        // this.authRouter.post("/auth/password/change", authenticate, this.authHandler.handleCreate.bind(this.authHandler));
         return this.authRouter;
     }
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserStore, { IUser, IUserRegister } from "../store/users";
 import Handler, { Status } from ".";
-import {hashPassword} from "../utils/hasher";
+import Logger from "../utils/logger";
 
 export default class AuthHandler extends Handler {
     private usersStore: UserStore;
@@ -11,21 +11,41 @@ export default class AuthHandler extends Handler {
         this.usersStore = new UserStore();
     }
 
-    public async handleCreate(req: Request, res: Response) {
+    public async handleRegist(req: Request, res: Response) {
         try {
             const userRegisterData = req.body as IUserRegister;
 
-            const user: IUser = {
-                email: userRegisterData.email,
-                login: userRegisterData.login,
-                password_hash: await hashPassword(userRegisterData.password), 
+            if (!this.isValidLogin(userRegisterData.login)) {
+                this.response(res, Status.BadRequest, null, "Invalid login. Login must be 3-50 characters long and contain only letters, digits, and underscores.");
+                return;
             }
 
-            const userCreated = await this.usersStore.create(user);
-            this.response(res, Status.Ok, { isCreated: userCreated !== null });
+            if (!this.isValidPassword(userRegisterData.password)) {
+                this.response(res, Status.BadRequest, null,"Invalid password. Password must be at least 8 characters long, include at least one number, one uppercase letter, and one special character.")
+                return;
+            }
+
+            const userCreated = await this.usersStore.create(userRegisterData);
+            if (!userCreated) throw new Error("Failed create user"); 
+            
+            this.response(res, Status.Ok, {
+                userId: userCreated.id,
+                login: userCreated.login,
+                balanceEUR: userCreated.balance_eur,
+            });
         } catch (error) {
-            console.error("Error in handleCreate:", error);
-            res.status(500).json({ message: "Internal server error" });
+            Logger("ERROR", "AUTH_HANDLER", "Error in handleCreate:", error);
+            this.response(res, 500, null, "Internal Server Error")
         }
+    }
+
+    private isValidLogin(login: string): boolean {
+        const loginRegex = /^[a-zA-Z0-9_]{3,50}$/; // Только буквы, цифры и подчеркивания, длина 3-50 символов
+        return loginRegex.test(login);
+    }
+
+    private isValidPassword(password: string): boolean {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*_]{8,}$/; //Минимум 8 символов, хотя бы одна цифра, одна заглавная буква и один специальный символ
+        return passwordRegex.test(password);
     }
 }

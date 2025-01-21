@@ -7,6 +7,7 @@ import AuthRouter from "../routes/auth";
 import ProductRouter from "../routes/products";
 import PurchasesRouter from "../routes/purchases";
 import SkinportRouter from "../routes/skinport";
+import authenticate from "../middleware/auth";
 
 export default class API {
     private static instance: API;
@@ -74,7 +75,7 @@ export default class API {
         this.routesCors();
 
         this.apiServer.use("/api/v1", this.routesV1());
-        this.apiServer.use("/api/v2", this.routesV2()); 
+        this.apiServer.use("/api/v2", authenticate, this.routesV2()); 
 
         exportEndpoints(this.apiServer, "../../postman.json")
 

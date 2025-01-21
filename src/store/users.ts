@@ -1,9 +1,10 @@
 import postgres from "postgres";
 import Store from ".";
 import Logger from "../utils/logger";
+import { hashPassword } from "../utils/hasher";
 
 export interface IUserStore extends IUser {
-    is_active: boolean;
+    balance_eur: number;
     updated_at: Date;
     created_at: Date;
 }
@@ -15,12 +16,10 @@ export interface IUserStoreResponse extends IUserStore {
 export interface IUser {
     login: string;
     password_hash: string;
-    email: string;
 }
 
 export interface IUserRegister {
     login: string;
-    email: string;
     password: string;
 }
 
@@ -31,18 +30,19 @@ export default class UserStore {
         this.db = Store.getInstance().getDatabase();
     }
 
-    public async create(user: IUser) {
+    public async create(user: IUserRegister): Promise<IUserStoreResponse | null> {
         try {
             const storeUser: IUserStore = {
                 ...user,
+                balance_eur: 0,
+                password_hash: await hashPassword(user.password),
                 created_at: new Date(),
                 updated_at: new Date(),
-                is_active: true
             }
 
-            const insert = this.db(storeUser, 'login', 'password_hash', 'email', 'is_active', 'created_at', 'updated_at');
-            await this.db<IUserStore[]>`INSERT INTO users ${insert}`;
-            return storeUser;
+            const insert = this.db(storeUser, 'login', 'password_hash', 'balance_eur', 'created_at', 'updated_at');
+            const createdUser = await this.db<IUserStoreResponse[]>`INSERT INTO users ${insert} RETURNING *`;
+            return createdUser[0];
         } catch (error: any) {
             Logger("ERROR", "USER_STORE", error.message);
             return null;
@@ -53,11 +53,13 @@ export default class UserStore {
 
     }
 
-    public async findUserByEmail() {
-
-    }
-
-    public async findUserByLogin() {
-
+    public async findUserByLogin(login: string): Promise<IUserStoreResponse | null> {
+        try {
+            const foundUser = await this.db<IUserStoreResponse[]>`SELECT * FROM users WHERE login = ${login} LIMIT 1`;
+            return foundUser[0];
+        } catch (error: any) {
+            Logger("ERROR", "USER_STORE", error.message);
+            return null;
+        } 
     }    
 }

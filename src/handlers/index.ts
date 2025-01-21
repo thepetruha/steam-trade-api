@@ -4,8 +4,8 @@ export enum Status {
     Ok = 200,
     InternalServerError = 500,
     NotFound = 404,
-    BadRequest = 403,
-    BadAuthorization = 401
+    BadRequest = 400,
+    NoAuthorization = 401
 }
 
 class Handler {
