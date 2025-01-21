@@ -49,12 +49,12 @@ export default class API {
     private routesV2() {
         const router = express.Router(); 
         const productsRouter = new ProductRouter().routesInit();
-        const purchasesRouter = new PurchasesRouter().routesInit();
         const skinportRouter = new SkinportRouter().routesInit();
+        // const purchasesRouter = new PurchasesRouter().routesInit();
 
         router.use(productsRouter); 
-        router.use(purchasesRouter);
         router.use(skinportRouter);
+        // router.use(purchasesRouter);
 
         return router;
     }

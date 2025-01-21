@@ -13,7 +13,7 @@ export default class AuthRouter {
 
     public routesInit() {
         this.authRouter.post("/auth/register", this.authHandler.handleRegist.bind(this.authHandler));
-        // this.authRouter.post("/auth/password/change", authenticate, this.authHandler.handleCreate.bind(this.authHandler));
+        this.authRouter.post("/auth/password/change", authenticate, this.authHandler.handleChangePassword.bind(this.authHandler));
         return this.authRouter;
     }
 }

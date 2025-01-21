@@ -19,14 +19,18 @@ export default async function authenticate(req: Request, res: Response, next: Ne
     
         const login = strCredData[0];
         const password = strCredData[1];
+
+        if (login === "" || password === "") {
+            throw new Error("Failed get Login or Password");
+        }
     
         const store = new UserStore();
         const foundUser = await store.findUserByLogin(login);
         if (!foundUser) throw new Error("Failed find user");
 
-        const isPass = await comparePasswords(password, foundUser.password_hash);
-        if (isPass) {
-            req.body.userId = foundUser.id;
+        const isPasswordsEquel = await comparePasswords(password, foundUser.password_hash);
+        if (isPasswordsEquel) {
+            req.body.user = foundUser;
             next();
             return;
         }

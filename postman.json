@@ -25,36 +25,39 @@
       }
     },
     {
-      "name": "/api/v2/product [POST]",
+      "name": "/api/v1/auth/password/change [POST]",
       "request": {
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "{{base_url}}/api/v2/product",
+          "raw": "{{base_url}}/api/v1/auth/password/change",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "api",
-            "v2",
-            "product"
+            "v1",
+            "auth",
+            "password",
+            "change"
           ]
         }
       }
     },
     {
-      "name": "/api/v2/purchase [POST]",
+      "name": "/api/v2/product/purchase [POST]",
       "request": {
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "{{base_url}}/api/v2/purchase",
+          "raw": "{{base_url}}/api/v2/product/purchase",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "api",
             "v2",
+            "product",
             "purchase"
           ]
         }

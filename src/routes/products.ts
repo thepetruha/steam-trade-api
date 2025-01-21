@@ -1,5 +1,6 @@
 import { Router } from "express";
 import ProductsHandler from "../handlers/products";
+import authenticate from "../middleware/auth";
 
 export default class ProductRouter {
     private productHandler: ProductsHandler;
@@ -11,7 +12,7 @@ export default class ProductRouter {
     }
 
     public routesInit() {
-        this.productRouter.post("/product", this.productHandler.handleCreate.bind(this.productHandler));
+        this.productRouter.post("/product/purchase", authenticate, this.productHandler.handlePurchase.bind(this.productHandler));
         return this.productRouter;
     }
 }

@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS products (
     price NUMERIC(10, 2) NOT NULL,                  -- Цена продукта с точностью до двух десятичных знаков
     currncy VARCHAR(255) NOT NULL,                  -- Валюта
     quantity INT NOT NULL,                          -- Количество
-    in_stock INT NOT NULL,                          -- Количество в наличии
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Дата создания
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Дата обновления
 );
