@@ -1,10 +1,11 @@
-import postgres from "postgres";
+import postgres, { TransactionSql } from "postgres";
 import Store from ".";
 import Logger from "../utils/logger";
 import { hashPassword } from "../utils/hasher";
 
 export interface IUserStore extends IUser {
     balance_eur: number;
+    reserved_balance: number;
     updated_at: Date;
     created_at: Date;
 }
@@ -30,17 +31,22 @@ export default class UserStore {
         this.db = Store.getInstance().getDatabase();
     }
 
+    public getDB() {
+        return this.db
+    }
+
     public async create(user: IUserRegister): Promise<IUserStoreResponse | null> {
         try {
             const storeUser: IUserStore = {
                 ...user,
                 balance_eur: 0,
+                reserved_balance: 0,
                 password_hash: await hashPassword(user.password),
                 created_at: new Date(),
                 updated_at: new Date(),
             }
 
-            const insert = this.db(storeUser, 'login', 'password_hash', 'balance_eur', 'created_at', 'updated_at');
+            const insert = this.db(storeUser, 'login', 'password_hash', 'balance_eur', 'reserved_balance', 'created_at', 'updated_at');
             const createdUser = await this.db<IUserStoreResponse[]>`
                 INSERT INTO users ${insert} 
                 RETURNING *
@@ -96,7 +102,6 @@ export default class UserStore {
         }
     }
 
-
     public async findById(user_id: number) {
         try {
             const foundUser = await this.db<IUserStoreResponse[]>`
@@ -132,6 +137,102 @@ export default class UserStore {
             return updatedUser[0];
         } catch (error: any) {
             Logger("ERROR", "USER_STORE", error.message);
+            return null;
+        }
+    }
+
+    public async update(user_id: number, user: IUserStore): Promise<IUserStoreResponse | null> {
+        try {
+            const { balance_eur, reserved_balance } = user;
+    
+            if (!user_id) {
+                throw new Error("User ID is required for update");
+            }
+    
+            const updatedUser = await this.db<IUserStoreResponse[]>`
+                UPDATE users 
+                SET 
+                    balance_eur = COALESCE(${balance_eur}, balance_eur),
+                    reserved_balance = COALESCE(${reserved_balance}, reserved_balance),
+                    updated_at = ${new Date()}
+                WHERE id = ${user_id} 
+                RETURNING *;
+            `;
+    
+            if (updatedUser.length === 0) {
+                return null; 
+            }
+    
+            return updatedUser[0];
+        } catch (error: any) {
+            Logger("ERROR", "USER_STORE", `Failed to update user: ${error.message}`);
+            return null;
+        }
+    }
+
+    public async reserveBalance(user_id: number, amount: number, trx?: postgres.TransactionSql<{}>): Promise<IUserStoreResponse | null> {
+        try {
+            if (amount <= 0) {
+                throw new Error("Amount to reserve must be greater than 0");
+            }
+
+            const user = await this.findById(user_id);
+            if (!user) {
+                Logger("ERROR", "USER_STORE", `User with ID ${user_id} not found`);
+                return null;
+            }
+    
+            if (user.balance_eur < amount) {
+                Logger("ERROR", "USER_STORE", `Insufficient balance for user ID ${user_id}`);
+                return null;
+            }
+
+            const db = trx || this.db
+            const updatedUser = await db<IUserStoreResponse[]>`
+                UPDATE users 
+                SET 
+                    balance_eur = balance_eur - ${amount}, 
+                    reserved_balance = reserved_balance + ${amount}, 
+                    updated_at = ${new Date()}
+                WHERE id = ${user_id} 
+                RETURNING *;
+            `;
+   
+            if (updatedUser.length === 0) {
+                return null;
+            }
+    
+            return updatedUser[0] 
+        } catch (error: any) {
+            Logger("ERROR", "USER_STORE", `Failed to reserve balance for user ID ${user_id}: ${error.message}`);
+            return null;
+        }
+    }
+
+    public async deductReservedBalance(user_id: number, total_price: number, trx?: postgres.TransactionSql<{}>): Promise<IUserStoreResponse | null> {
+        try {
+            if (total_price <= 0) {
+                throw new Error("Total price must be greater than 0");
+            }
+           
+            const db = trx || this.db
+            const updatedUser = await db<IUserStoreResponse[]>`
+                UPDATE users 
+                SET 
+                    reserved_balance = reserved_balance - ${total_price},
+                    updated_at = ${new Date().toISOString()}
+                WHERE id = ${user_id}
+                    AND reserved_balance >= ${total_price} 
+                RETURNING *;
+            `;
+
+            if (updatedUser.length === 0) {
+                throw new Error(`Failed to deduct reserved balance for user ID ${user_id}`);
+            }
+
+            return updatedUser[0];
+        } catch (error: any) {
+            Logger("ERROR", "USER_STORE", `Failed to deduct reserved balance: ${error.message}`);
             return null;
         }
     }

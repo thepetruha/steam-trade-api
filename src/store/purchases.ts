@@ -1,6 +1,7 @@
 import postgres from "postgres";
 import Store from ".";
 import Logger from "../utils/logger";
+import { IProductStoreResponse } from "./products";
 
 export interface IPurchaseStoreResponse extends IPurchaseStore {
     id: number;
@@ -17,6 +18,12 @@ export interface IPurchase {
     quantity: number;
 }
 
+export interface INewPurchase { 
+    quantity: number, 
+    totalPrice: number, 
+    product: IProductStoreResponse, 
+}
+
 export default class PurchaseStore {
     private db: postgres.Sql;
 
@@ -24,16 +31,24 @@ export default class PurchaseStore {
         this.db = Store.getInstance().getDatabase();
     }
 
-    public async create(purchase: IPurchase): Promise<IPurchaseStoreResponse | null> {
+    public async create(purchase: IPurchase, trx?: postgres.TransactionSql<{}>): Promise<IPurchaseStoreResponse | null> {
         try {
             const storePurchase: IPurchaseStore = {
                 ...purchase,
                 purchase_date: new Date(),
             }
 
-            const insert = this.db(storePurchase, 'user_id', 'product_id', 'quantity', 'total_price', 'purchase_date');
+            const db = trx || this.db
+            const insert = db(
+                storePurchase, 
+                'user_id', 
+                'product_id', 
+                'quantity', 
+                'total_price', 
+                'purchase_date'
+            );
 
-            const purchasedRecord = await this.db<IPurchaseStoreResponse[]>`
+            const purchasedRecord = await db<IPurchaseStoreResponse[]>`
                 INSERT INTO purchases ${insert} 
                 RETURNING *
             `;

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import Handler, { Status } from ".";
-import ProductStore from "../store/products";
-import PurchaseStore from "../store/purchases";
+import ProductStore, { IProductStoreResponse } from "../store/products";
+import PurchaseStore, { INewPurchase } from "../store/purchases";
 import UserStore, { IUserStoreResponse } from "../store/users";
+import postgres from "postgres";
+import Logger from "../utils/logger";
 
 export default class ProductsHandler extends Handler {
     private productStore: ProductStore;
@@ -23,47 +25,103 @@ export default class ProductsHandler extends Handler {
                 product_id: number;
                 quantity: number;
             };
-
+    
+            if (!user || !product_id || !quantity || quantity <= 0) {
+                this.response(res, Status.BadRequest, null, "Invalid input");
+                return;
+            }
+    
             const product = await this.productStore.findById(product_id);
             if (!product) {
                 this.response(res, Status.NotFound, null, "Product not found");
                 return;
             }
-
+    
             if (product.quantity < quantity) {
                 this.response(res, Status.BadRequest, null, "Insufficient stock");
                 return;
             }
-
-            const updatedStock = product.quantity - quantity;
-            await this.productStore.updateStock(product_id, updatedStock);
-
+    
             const totalPrice = product.price * quantity;
-
             if (Number(user.balance_eur) < Number(totalPrice)) {
-                this.response(res, Status.BadRequest, null, "There are not enough funds on your balance");
+                this.response(res, Status.BadRequest, null, "Insufficient balance");
                 return;
             }
 
-            const newUserBalance = user.balance_eur - totalPrice;
-            const updatedUser = this.userStore.updateBalanceById(user.id, newUserBalance);
-            if (!updatedUser) throw new Error("Failed update balance");
+            const resultTransaction = await this.userStore.getDB().begin((sql) => {
+                return this.purchaseProduct(sql, user, {
+                    totalPrice,
+                    quantity,
+                    product
+                });
+            }); 
 
-            const purchase = await this.purchaseStore.create({
-                quantity,
-                product_id,
-                user_id: user.id,
-                total_price: totalPrice,
-            });
+            if (!resultTransaction) {
+                this.response(res, Status.InternalServerError, null, "Failed make transaction"); 
+                return;
+            }
+
+            const { purchase, updatedUser } = resultTransaction;
 
             this.response(res, Status.Ok, { 
+                purchase: purchase, 
+                newUserBalance: updatedUser.balance_eur,
+            });
+        } catch (error: any) {
+            Logger("ERROR", "REQUEST_PRUCHASE_PRODUCT", error.message);
+            this.response(res, Status.InternalServerError, null, "Internal server error");
+        }
+    }
+
+    private async purchaseProduct(
+        sql: postgres.TransactionSql<{}>, 
+        user: IUserStoreResponse,
+        newPurchase: INewPurchase
+    ) {
+        try {
+            // 1. Резервируем баланс пользователя для будущего списания (когда все манипуляции с другими таблицами будут завершины)
+            const reservedBalance = await this.userStore.reserveBalance(
+                user.id, 
+                newPurchase.totalPrice, 
+                sql
+            );
+
+            if (!reservedBalance) {
+                throw new Error("Failed to reserve balance");
+            }
+
+            // 2. Уменьшаем количество товаров в наличии по его ID
+            const updatedStock = newPurchase.product.quantity - newPurchase.quantity;
+            await this.productStore.updateStock(newPurchase.product.id, updatedStock);
+
+            // 3. Создаем запись в таблице с покупками
+            const purchase = await this.purchaseStore.create({
+                quantity: newPurchase.quantity,
+                product_id: newPurchase.product.id,
+                total_price: newPurchase.totalPrice,
+                user_id: user.id,
+            }, sql);
+
+            // 4. Списываем окончательно средства (или завершаем резервирование)
+            const updatedUser = await this.userStore.deductReservedBalance(
+                user.id, 
+                newPurchase.totalPrice, 
+                sql
+            );
+
+            if (!updatedUser) {
+                throw new Error("Failed to finalize balance deduction");
+            }
+
+            return { 
+                reservedBalance, 
+                updatedStock, 
                 purchase, 
-                newUserBalance: newUserBalance.toFixed(2),
-                oldUserBalance: user.balance_eur
-             });
-        } catch (error) {
-            console.error("Error in handlePurchase:", error);
-            res.status(500).json({ message: "Internal server error" });
+                updatedUser
+            }
+        } catch (error: any) {
+            Logger("ERROR", "PURCHASE_TRX", error.message);
+            return null;
         }
     }
 }
