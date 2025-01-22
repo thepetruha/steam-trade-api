@@ -78,50 +78,56 @@ export default class ProductsHandler extends Handler {
         user: IUserStoreResponse,
         newPurchase: INewPurchase
     ) {
-        try {
-            // 1. Резервируем баланс пользователя для будущего списания (когда все манипуляции с другими таблицами будут завершины)
-            const reservedBalance = await this.userStore.reserveBalance(
-                user.id, 
-                newPurchase.totalPrice, 
-                sql
-            );
+        // 1. Резервируем баланс пользователя для будущего списания (когда все манипуляции с другими таблицами будут завершины)
+        const reservedBalance = await this.userStore.reserveBalance(
+            user.id, 
+            newPurchase.totalPrice, 
+            sql
+        );
 
-            if (!reservedBalance) {
-                throw new Error("Failed to reserve balance");
-            }
+        if (!reservedBalance) {
+            throw new Error("Failed to reserve balance");
+        }
 
-            // 2. Уменьшаем количество товаров в наличии по его ID
-            const updatedStock = newPurchase.product.quantity - newPurchase.quantity;
-            await this.productStore.updateStock(newPurchase.product.id, updatedStock);
+        // 2. Уменьшаем количество товаров в наличии по его ID
+        const isUpdateStock = await this.productStore.updateStockWithCondition(
+            newPurchase.product.id, 
+            newPurchase.quantity,
+            sql
+        );
 
-            // 3. Создаем запись в таблице с покупками
-            const purchase = await this.purchaseStore.create({
-                quantity: newPurchase.quantity,
-                product_id: newPurchase.product.id,
-                total_price: newPurchase.totalPrice,
-                user_id: user.id,
-            }, sql);
+        if (!isUpdateStock) {
+            throw new Error(`Failed to update stock for product ID ${newPurchase.product.id}`);
+        }
 
-            // 4. Списываем окончательно средства (или завершаем резервирование)
-            const updatedUser = await this.userStore.deductReservedBalance(
-                user.id, 
-                newPurchase.totalPrice, 
-                sql
-            );
+        // 3. Создаем запись в таблице с покупками
+        const purchase = await this.purchaseStore.create({
+            quantity: newPurchase.quantity,
+            product_id: newPurchase.product.id,
+            total_price: newPurchase.totalPrice,
+            user_id: user.id,
+        }, sql);
 
-            if (!updatedUser) {
-                throw new Error("Failed to finalize balance deduction");
-            }
+        // 4. Списываем окончательно средства (или завершаем резервирование)
+        const updatedUser = await this.userStore.deductReservedBalance(
+            user.id, 
+            newPurchase.totalPrice, 
+            sql
+        );
 
-            return { 
-                reservedBalance, 
-                updatedStock, 
-                purchase, 
-                updatedUser
-            }
-        } catch (error: any) {
-            Logger("ERROR", "PURCHASE_TRX", error.message);
-            return null;
+        //Будущие доработки
+        // - поддеркжа потверждение через прилжоение или Email, Phone...
+        // - разделение на стадии покупк (пользователь нажимает купить, у него резервируется средства. Система ожидает потвержедния. Потом шаг списания)
+
+        if (!updatedUser) {
+            throw new Error("Failed to finalize balance deduction");
+        }
+
+        return { 
+            reservedBalance, 
+            isUpdateStock, 
+            purchase, 
+            updatedUser
         }
     }
 }

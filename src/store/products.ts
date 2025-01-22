@@ -19,16 +19,17 @@ export interface IProduct {
 }
 
 export default class ProductStore {
-    private db: postgres.Sql;
+    private sql: postgres.Sql;
 
     constructor() {
-        this.db = Store.getInstance().getDatabase();
+        this.sql = Store.getInstance().getDatabase();
     }
 
     public async findById(product_id: number): Promise<IProductStoreResponse | null> {
         try {
-            const foundProduct = await this.db<IProductStoreResponse[]>`
-                SELECT * FROM products WHERE id = ${product_id} LIMIT 1
+            const foundProduct = await this.sql<IProductStoreResponse[]>`
+                SELECT * FROM products 
+                WHERE id = ${product_id} LIMIT 1
             `;
 
             if (foundProduct.length === 0) {
@@ -42,15 +43,21 @@ export default class ProductStore {
         }
     }
 
-    public async updateStock(product_id: number, newStock: number): Promise<boolean> {
+    public async updateStockWithCondition(product_id: number, deduct: number, trx?: postgres.TransactionSql<{}>): Promise<boolean> {
         try {
-            const updatedProduct = await this.db`
+            const sql = trx || this.sql;
+            const updatedProduct = await sql`
                 UPDATE products
-                SET quantity = ${newStock}, updated_at = ${new Date()}
-                WHERE id = ${product_id}
+                SET quantity = quantity - ${deduct}, updated_at = ${new Date().toISOString()}
+                WHERE id = ${product_id} AND quantity >= ${deduct}
+                RETURNING quantity;
             `;
             
-            return updatedProduct.count > 0;
+            if (updatedProduct.count === 0) {
+                throw new Error(`Insufficient stock for product ID ${product_id}`);
+            }
+    
+            return true;
         } catch (error: any) {
             Logger("ERROR", "PRODUCT_STORE", error.message);
             return false;
@@ -67,8 +74,8 @@ export default class ProductStore {
                 currncy: "EUR", // По умолчанию EUR, можно изменить на основе требований
             };
 
-            const insert = this.db(storeProduct, "name", "price", "created_at", "updated_at", "quantity", "currncy");
-            const createdProduct = await this.db<IProductStoreResponse[]>`
+            const insert = this.sql(storeProduct, "name", "price", "created_at", "updated_at", "quantity", "currncy");
+            const createdProduct = await this.sql<IProductStoreResponse[]>`
                 INSERT INTO products ${insert}
                 RETURNING *
             `;
@@ -86,7 +93,7 @@ export default class ProductStore {
 
     public async deleteById(product_id: number): Promise<boolean> {
         try {
-            const deletedProduct = await this.db`
+            const deletedProduct = await this.sql`
                 DELETE FROM products WHERE id = ${product_id}
             `;
 
